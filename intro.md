@@ -66,6 +66,7 @@ prefix. So let's add relevant includes and directives:
 ```
 #include <istream>
 #include <stdint.h>
+#include <vector>
 
 using namespace std;
 ```
