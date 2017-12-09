@@ -232,26 +232,29 @@ impl Script {
 ## C++
 
 ```cpp
-/// Represent's Bitcoin script.                                                         
-struct Script(Vec<u8>);                                                                 
-                                                                                        
-impl Script {                                                                           
-    /// Deserializes the script from a reader.
-    fn deserialize<R: Read>(reader: &mut R) -> io::Result<Self> {                       
-        let len = deserialize_varint(reader)?;
-        // This is consensus rule, so theoretically no need to check it,
-        // but serves as a protection against corrupted inputs.
-        if len > 10_000 {
-            return Err(ErrorKind::InvalidData.into());
-        }
+/// Represents bitcoin script.
+class Script {
+        public:
+                /// Constructs sript by deserializing from stream.
+                Script(istream &stream) : data(), valid(false) {
+                        uint64_t len = deserialize_varint(stream);
+                        if(stream.fail() || len > 10000) {
+                                return;
+                        }
 
-        let mut reader = reader.by_ref().take(len);
-        let mut data = Vec::with_capacity(len as usize);
+                        data.resize((size_t)len);
+                        stream.read(&data[0], len);
+                        valid = !stream.fail();
+                }
 
-        io::copy(&mut reader, &mut data)?;
-        Ok(Script(data))
-    }
-}
+                /// Returns true if deserialization succeeded.
+                bool is_valid() {
+                        return valid;
+                }
+        private:
+                vector<char> data;
+                bool valid;
+};
 ```
 
 ### 256-bit hash
